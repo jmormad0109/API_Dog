@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.models.Dog
+import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.DeleteDogUseCase
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.DeleteDogsFromDataBaseUseCase
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.GetDogsBreedUseCase
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.usercase.GetDogsUseCase
@@ -13,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
 /*
 * Autor: santiago rodenas herráiz
@@ -45,7 +45,8 @@ cuando se llame al método get del provider. De esta forma, aseguramos que se cu
 class DogViewModel @Inject constructor(
     private val useCaseList : GetDogsUseCase,
     private val getDogsBreedUseCase: GetDogsBreedUseCase,
-    private val userCaseDeleteDatabase : DeleteDogsFromDataBaseUseCase
+    private val userCaseDeleteDatabase : DeleteDogsFromDataBaseUseCase,
+    private val deleteDogUseCase: DeleteDogUseCase
 
 ): ViewModel() {
 
@@ -92,6 +93,11 @@ class DogViewModel @Inject constructor(
 
     fun searchByBreed(breed: String){
         //Log.i("TAG-DOGS", "La raza elegida es $breed")
+        /*if (breed != null){
+            this.breed.value = breed  //notificamos cambio
+        }else{
+            list()
+        }*/
         this.breed.value = breed  //notificamos cambio
     }
 
@@ -104,13 +110,40 @@ class DogViewModel @Inject constructor(
     de la BBDD.
      */
 
+    fun deleteDog(breed: String) {
+        viewModelScope.launch {
+            progressBarLiveData.value = true
+            delay(1000)
+            withContext(Dispatchers.IO){
+                deleteDogUseCase(breed)
+                val listaActualizada = useCaseList()
+                if (listaActualizada != null){
+                    dogListLiveData.postValue(listaActualizada!!)
+                }else{
+                    list()
+                }
+            }
+            progressBarLiveData.value = false
+        }
+    }
+
 
     fun delete() {
         viewModelScope.launch {
+            progressBarLiveData.value = true //notifico
+            delay(500)
+            var data : List<Dog> ?
             withContext(Dispatchers.IO){
-                userCaseDeleteDatabase() //si invocamos para borrar la base de datos.
+                userCaseDeleteDatabase()
+                data = useCaseList()
             }
-            list() //Vuelvo a cargar los datos desde Dogs. Lo hacemos así, por sencillez, pero no es óptimo.
+            dogListLiveData.value = emptyList()
+            data.let {
+                delay(1000)
+                dogListLiveData.value = it  //notifico
+                progressBarLiveData.value = false  //notifico
+            }
+            //Vuelvo a cargar los datos desde Dogs. Lo hacemos así, por sencillez, pero no es óptimo.
         }
     }
 

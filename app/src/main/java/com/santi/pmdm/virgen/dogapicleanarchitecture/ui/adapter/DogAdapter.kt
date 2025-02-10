@@ -2,13 +2,17 @@ package com.pmdm.virgen.dogapi.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.santi.pmdm.virgen.dogapicleanarchitecture.R
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.models.Repository
 import com.santi.pmdm.virgen.dogapicleanarchitecture.domain.models.Dog
 
 
-class DogAdapter : RecyclerView.Adapter<ViewHDog>() {
+class DogAdapter(
+    private val delete: (String) -> Unit
+) : RecyclerView.Adapter<ViewHDog>() {
+
 
     var dogRepository: List<Dog> = Repository.dogs //de momento, que sólo sean las imágenes.
 
@@ -21,9 +25,7 @@ class DogAdapter : RecyclerView.Adapter<ViewHDog>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHDog {
         val layoutInflater = LayoutInflater.from(parent.context)  //Objeto para crear la vista.
         val layoutDogItem = R.layout.item_dog  //accedo al xml del item a crear.
-        return ViewHDog(
-            layoutInflater.inflate(layoutDogItem, parent, false)
-        )
+        return ViewHDog(layoutInflater.inflate(layoutDogItem, parent, false))
     }
 
 
@@ -33,7 +35,13 @@ class DogAdapter : RecyclerView.Adapter<ViewHDog>() {
      */
     override fun onBindViewHolder(holder: ViewHDog, position: Int) {
         //LO QUE HARÉ ES SETEAR LOS DATOS.
+        holder.itemView.findViewById<ImageButton>(R.id.btn_borrar_dog).setOnClickListener {
+            val breed = dogRepository[position].breed
+            delete(breed)
+        }
+
         holder.rendereize(dogRepository.get(position), position)
+
     }
 
     /*

@@ -36,6 +36,19 @@
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/btn_borrar_dog"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.827"
+                app:layout_constraintStart_toEndOf="@+id/iv_imagen"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/baseline_delete_24" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

@@ -2,20 +2,21 @@ package com.santi.pmdm.virgen.dogapicleanarchitecture.ui.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pmdm.virgen.dogapi.ui.adapter.DogAdapter
 import com.santi.pmdm.virgen.dogapicleanarchitecture.R
 import com.santi.pmdm.virgen.dogapicleanarchitecture.databinding.ActivityMainBinding
 import com.santi.pmdm.virgen.dogapicleanarchitecture.ui.modelview.DogViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.delay
 
 /*
 @author santiago rodenas herráiz
@@ -128,12 +129,22 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         )
     }
 
+
+
+    private fun deleteDog(breed: String){
+        dogViewModel.deleteDog(breed)
+        Handler(Looper.getMainLooper()).postDelayed({
+            Toast.makeText(this, "Perro eliminado", Toast.LENGTH_LONG).show()
+        }, 1000)
+
+    }
+
     /*
     Pone todo en funcionamiento
      */
     private fun initRecyclerView(){
         binding.myRecyclerPpal.layoutManager = LinearLayoutManager(this)
-        adapter = DogAdapter()
+        adapter = DogAdapter(::deleteDog)
     }
 
 
